@@ -10,35 +10,32 @@
         body {
             margin: 0;
             padding: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
             font-family: 'Sarabun', sans-serif;
-            overflow: hidden;
-            position: relative;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center;
             max-width: 90%;
             width: 400px;
+            margin: 20px 0;
+            position: relative;
             z-index: 10;
-            transition: transform 0.3s;
-            position: relative; /* สำคัญสำหรับการจัดตำแหน่ง */
         }
 
-        h1 { color: #ff4d6d; font-size: 2em; margin-bottom: 10px; }
+        h1 { color: #ff4d6d; font-size: 1.8em; margin-bottom: 10px; }
         p { color: #555; font-size: 1.1em; line-height: 1.6; }
         
         .hidden-content { display: none; opacity: 0; transition: opacity 0.5s ease-in; }
         
-        /* ปุ่มทั่วไป */
         .btn {
             background-color: #ff4d6d;
             color: white;
@@ -49,131 +46,97 @@
             cursor: pointer;
             margin: 10px;
             box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
-            transition: transform 0.2s, background 0.2s;
+            transition: transform 0.2s;
         }
-        .btn:hover { transform: scale(1.05); background-color: #ff224b; }
+        .btn:hover { transform: scale(1.05); }
 
-        /* ปุ่มหลบหนี */
         #no-btn {
             background-color: #555;
-            position: absolute; /* เพื่อให้ขยับไปไหนก็ได้ */
-            transition: 0.1s; /* ขยับเร็วๆ */
-        }
-
-        .btn-group {
-            margin-top: 20px;
-            height: 60px; /* จองพื้นที่ให้ปุ่ม */
-            position: relative;
-        }
-
-        .rose-icon { font-size: 4em; display: block; margin: 20px 0; animation: float 3s ease-in-out infinite; }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        .heart {
             position: absolute;
-            bottom: -10vh;
-            background-color: rgba(255, 255, 255, 0.6);
-            width: 20px;
-            height: 20px;
-            transform: rotate(45deg);
-            animation: fly 5s linear infinite;
-            z-index: 1;
+            transition: 0.1s;
         }
-        @keyframes fly {
-            0% { transform: translateY(0) rotate(45deg); opacity: 1; }
-            100% { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
+
+        .gallery {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
+
+        .memory-img {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .memory-img:hover { transform: scale(1.02); }
+
+        video {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+
+        .caption { font-size: 0.9em; color: #888; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="hearts-container"></div>
+    <div id="step1" class="card">
+        <h1 style="font-size: 4em;">💌</h1>
+        <h1>มีความลับจะบอก...</h1>
+        <p>พร้อมฟังรึยัง?</p>
+        <button class="btn" onclick="nextStep('step1', 'step2')">พร้อมแล้ว!</button>
+    </div>
 
-    <div class="card">
-        <div id="step1">
-            <div class="rose-icon">💌</div>
-            <h1>มีความลับจะบอก...</h1>
-            <p>พร้อมฟังรึยัง?</p>
-            <br>
-            <button class="btn" onclick="goToStep2()">พร้อมแล้ว!</button>
+    <div id="step2" class="card hidden-content">
+        <h1 style="font-size: 4em;">🤔</h1>
+        <h1>ถามจริงๆ นะ</h1>
+        <p>รักเค้าไหม?</p>
+        <div>
+            <button class="btn" onclick="nextStep('step2', 'surprise')">รักที่สุด ❤️</button>
+            <button class="btn" id="no-btn" onmouseover="moveButton()">ไม่รัก 😝</button>
         </div>
+    </div>
 
-        <div id="step2" class="hidden-content">
-            <div class="rose-icon">🤔</div>
-            <h1>ถามจริงๆ นะ</h1>
-            <p>รักเค้าไหม?</p>
-            
-            <div class="btn-group">
-                <button class="btn" onclick="goToSurprise()">รักที่สุด ❤️</button>
-                <button class="btn" id="no-btn" onmouseover="moveButton()">ไม่รัก 😝</button>
+    <div id="surprise" class="card hidden-content">
+        <h1 style="font-size: 4em;">🌹</h1>
+        <h1>Happy Valentine's Day</h1>
+        <p>ขอบคุณที่รักกันนะ ❤️</p>
+
+        <div class="gallery">
+            <div><img src="img1.jpg" class="memory-img"><div class="caption">ความทรงจำที่ 1</div></div>
+            <div><img src="img2.jpg" class="memory-img"><div class="caption">ความทรงจำที่ 2</div></div>
+            <div><img src="img3.jpg" class="memory-img"><div class="caption">ความทรงจำที่ 3</div></div>
+            <div><img src="img4.jpg" class="memory-img"><div class="caption">ความทรงจำที่ 4</div></div>
+            <div><img src="img5.jpg" class="memory-img"><div class="caption">ความทรงจำที่ 5</div></div>
+            <div><img src="img6.jpg" class="memory-img"><div class="caption">ความทรงจำที่ 6</div></div>
+
+            <div>
+                <video controls>
+                    <source src="vdo1.mp4" type="video/mp4">
+                </video>
+                <div class="caption">วิดีโอของเรา 🎥</div>
             </div>
-        </div>
-
-        <div id="surprise" class="hidden-content">
-            <div class="rose-icon">🌹</div>
-            <h1>เย้! รู้คำตอบอยู่แล้ว</h1>
-            <p>
-                ขอบคุณที่รักกันนะ <br>
-                ดอกกุหลาบ <b>9 ดอก</b> นี้ <br>
-                แทนคำสัญญาว่า "จะรักตลอดไป"
-            </p>
-            <br>
-            <p style="font-size: 0.9em; color: #888;">Happy Valentine's Day ❤️</p>
         </div>
     </div>
 
     <script>
-        // เปลี่ยนจากหน้า 1 ไป 2
-        function goToStep2() {
-            document.getElementById('step1').style.display = 'none';
-            const step2 = document.getElementById('step2');
-            step2.style.display = 'block';
-            setTimeout(() => { step2.style.opacity = 1; }, 100);
+        function nextStep(current, next) {
+            document.getElementById(current).style.display = 'none';
+            const nextEl = document.getElementById(next);
+            nextEl.style.display = 'block';
+            setTimeout(() => { nextEl.style.opacity = 1; }, 100);
         }
 
-        // เปลี่ยนจากหน้า 2 ไปเฉลย
-        function goToSurprise() {
-            document.getElementById('step2').style.display = 'none';
-            const surprise = document.getElementById('surprise');
-            surprise.style.display = 'block';
-            setTimeout(() => { surprise.style.opacity = 1; }, 100);
-            createMoreHearts(); // รัวหัวใจ
-        }
-
-        // ฟังก์ชันปุ่มหนี
         function moveButton() {
-            const noBtn = document.getElementById('no-btn');
-            
-            // คำนวณตำแหน่งสุ่ม (ให้ยังอยู่ในหน้าจอ)
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 100);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 100);
-
-            // สั่งย้ายตำแหน่ง
-            noBtn.style.position = 'fixed'; // เปลี่ยนเป็น fixed เพื่อให้หลุดจากกล่องข้อความ
-            noBtn.style.left = `${x}px`;
-            noBtn.style.top = `${y}px`;
-        }
-
-        // สร้างหัวใจลอย Background
-        function createHearts() {
-            const container = document.getElementById('hearts-container');
-            const heart = document.createElement('div');
-            heart.classList.add('heart');
-            heart.style.left = Math.random() * 100 + "vw";
-            heart.style.animationDuration = Math.random() * 2 + 3 + "s";
-            heart.style.backgroundColor = Math.random() > 0.5 ? '#ff4d6d' : '#ff9a9e';
-            container.appendChild(heart);
-            setTimeout(() => { heart.remove(); }, 5000);
-        }
-        setInterval(createHearts, 300);
-
-        function createMoreHearts() {
-            setInterval(createHearts, 100);
+            const btn = document.getElementById('no-btn');
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth - 50);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight - 50);
+            btn.style.position = 'fixed';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
         }
     </script>
 </body>
