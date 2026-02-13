@@ -11,23 +11,24 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            overflow-x: hidden; /* ห้ามเลื่อนซ้ายขวา */
+            overflow-x: hidden;
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
             font-family: 'Sarabun', sans-serif;
+            /* เมาส์รูปหัวใจ */
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewport="0 0 20 20" style="fill:black;font-size:20px"><text y="15">💖</text></svg>'), auto;
         }
 
-        /* --- Big Heart Background (หัวใจยักษ์พื้นหลัง) --- */
+        /* --- Big Heart Background --- */
         .big-heart-bg {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 80vw; /* ใหญ่คับจอ */
-            opacity: 0.15; /* จางๆ ไม่แย่งซีน */
+            font-size: 80vw;
+            opacity: 0.15;
             color: #ff4d6d;
             z-index: 0;
-            pointer-events: none; /* คลิกทะลุได้ */
+            pointer-events: none;
             animation: heartbeat 3s infinite ease-in-out;
         }
 
@@ -38,11 +39,11 @@
 
         /* --- กล่องข้อความ --- */
         .card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-align: center;
             width: 400px;
             max-width: 90%;
@@ -68,23 +69,27 @@
             margin: 10px;
             box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
             transition: all 0.2s;
+            position: relative;
+            z-index: 101; /* ปุ่มต้องกดได้เสมอ */
         }
         .btn:hover { transform: scale(1.1); }
         
+        /* ปุ่มหนี */
         #no-btn { 
             background: #666; 
-            position: absolute; 
+            position: absolute; /* เพื่อให้ขยับได้ */
             transition: all 0.2s ease-out; 
+            z-index: 102; /* ต้องอยู่สูงสุดๆ */
         }
 
         /* --- Gallery Container --- */
         #gallery-container {
             display: none;
-            position: relative; /* เพื่อให้ลูกๆ absolute เทียบกับตัวนี้ */
+            position: relative;
             width: 100%;
             overflow-x: hidden;
             z-index: 10;
-            padding-bottom: 100px; /* เผื่อที่ด้านล่าง */
+            padding-bottom: 150px; /* เผื่อที่ด้านล่าง */
         }
 
         .header-text {
@@ -100,7 +105,7 @@
 
         /* รูปภาพแบบสุ่ม (Scatter) */
         .scatter-photo {
-            position: absolute; /* ลอยอิสระ */
+            position: absolute;
             width: 150px; 
             height: auto;
             border: 5px solid white;
@@ -112,7 +117,7 @@
         
         .scatter-photo:hover {
             transform: scale(1.5) rotate(0deg) !important;
-            z-index: 50 !important;
+            z-index: 999 !important; /* ลอยทับทุกอย่าง */
             box-shadow: 0 15px 30px rgba(0,0,0,0.3);
         }
 
@@ -132,14 +137,16 @@
         }
         .lightbox img { max-width: 90%; max-height: 90%; border-radius: 10px; border: 5px solid white; }
 
+        /* FX Elements */
         .bg-element { position: fixed; pointer-events: none; z-index: 5; }
         @keyframes floatUp { from { transform: translateY(100vh); opacity: 0; } to { transform: translateY(-10vh); opacity: 1; } }
+        @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } }
+
     </style>
 </head>
 <body>
 
     <div class="big-heart-bg">❤️</div>
-
     <div id="lightbox" class="lightbox" onclick="closeImage()"><img id="lightbox-img" src=""></div>
     <div id="effects-container"></div>
 
@@ -154,7 +161,7 @@
         <h1 style="font-size: 4em;">🤔</h1>
         <h1>ถามจริงๆ นะ</h1>
         <p>รักเค้าไหม?</p>
-        <div style="height: 100px; position: relative; display: flex; justify-content: center; align-items: center;">
+        <div style="height: 120px; position: relative; display: flex; justify-content: center; align-items: center; gap: 20px;">
             <button class="btn" onclick="startGallery()">รักที่สุด ❤️</button>
             <button class="btn" id="no-btn" onmouseover="dodgeButton()" ontouchstart="dodgeButton()">ไม่รัก 😝</button>
         </div>
@@ -165,7 +172,6 @@
         <p style="text-align: center; color: #555; margin-bottom: 50px; position: relative; z-index: 20;">
             (ลองเลื่อนลงไปดูความทรงจำของเราสิ 👇)
         </p>
-        
         <div id="photo-area" style="position: relative; width: 100%;"></div>
     </div>
 
@@ -175,53 +181,49 @@
             document.getElementById(next).style.display = 'block';
         }
 
-        // --- เริ่มต้น Gallery แบบสุ่ม ---
+        // --- เริ่มต้น Gallery ---
         function startGallery() {
             document.getElementById('step2').style.display = 'none';
             const gallery = document.getElementById('gallery-container');
             const area = document.getElementById('photo-area');
             
-            // ตั้งค่าความสูงของพื้นที่ (ยิ่งรูปเยอะ ยิ่งต้องยาว)
-            // 56 รูป * ระยะห่าง 100px = สูงประมาณ 5600px
-            const stepY = 120; // ระยะห่างแนวตั้งระหว่างรูป
-            area.style.height = (56 * stepY + 600) + 'px'; // +600 เผื่อที่ให้วิดีโอ
+            // กำหนดความสูงพื้นที่ (56 รูป x 120px)
+            const stepY = 120;
+            area.style.height = (56 * stepY + 600) + 'px';
 
-            // Loop สร้าง 56 รูป
+            // Loop 56 รูป
             for(let i = 1; i <= 56; i++) {
                 const img = document.createElement('img');
-                img.src = `img${i}.jpg`; // ⚠️ อย่าลืมแก้ .png หรือ .jpg ให้ตรงไฟล์จริง
+                
+                // --- ระบบแก้บัค PNG/JPG อัตโนมัติ ---
+                img.src = `img${i}.png`; // ลองโหลด .png ก่อน
+                img.onerror = function() { 
+                    this.onerror = null; // ป้องกัน Loop นรก
+                    this.src = `img${i}.jpg`; // ถ้าพัง ให้ลองโหลด .jpg แทน
+                };
+                
                 img.className = 'scatter-photo';
                 img.loading = 'lazy';
                 
-                // 1. สุ่มตำแหน่งซ้าย-ขวา (Left)
-                // ให้รูปกระจายอยู่ระหว่าง 5% ถึง 70% ของหน้าจอ
-                const randomLeft = Math.floor(Math.random() * 70) + 5;
-                
-                // 2. ตำแหน่งแนวตั้ง (Top)
-                // ให้รูปเรียงลงมาเรื่อยๆ ไม่ทับกันจนมิด (i * stepY)
-                // บวกค่าสุ่มนิดหน่อย (+/- 30px) ให้ดูไม่เป็นระเบียบเกินไป
+                // สุ่มตำแหน่ง
+                const randomLeft = Math.floor(Math.random() * 70) + 5; // 5% - 75%
                 const randomTopOffset = Math.floor(Math.random() * 60) - 30;
                 const topPos = (i * stepY) + randomTopOffset;
-
-                // 3. สุ่มองศาเอียง (-20 ถึง 20 องศา)
                 const randomRotate = Math.floor(Math.random() * 40) - 20;
 
-                // Apply Styles
                 img.style.left = randomLeft + '%';
                 img.style.top = topPos + 'px';
                 img.style.transform = `rotate(${randomRotate}deg)`;
-                
-                // Z-index สุ่มเพื่อให้บางรูปทับ บางรูปถูกทับ
                 img.style.zIndex = i;
 
                 img.onclick = function() { openImage(this.src); };
                 area.appendChild(img);
             }
 
-            // --- เพิ่มวิดีโอปิดท้าย ---
+            // เพิ่มวิดีโอ
             const vdoDiv = document.createElement('div');
             vdoDiv.style.position = 'absolute';
-            vdoDiv.style.bottom = '50px'; // อยู่ล่างสุด
+            vdoDiv.style.bottom = '50px';
             vdoDiv.style.left = '50%';
             vdoDiv.style.transform = 'translateX(-50%)';
             vdoDiv.style.width = '90%';
@@ -239,32 +241,30 @@
             `;
             area.appendChild(vdoDiv);
 
-            // Show Gallery
             gallery.style.display = 'block';
-            
-            // Effect
             setInterval(createHeart, 300);
         }
 
-        // --- ปุ่มหนี (ระยะใกล้) ---
+        // --- ปุ่มหนี (Fix Z-index + Scope) ---
         function dodgeButton() {
             const btn = document.getElementById('no-btn');
-            const moveX = (Math.random() * 150 - 75); // ขยับซ้ายขวาไม่เกิน 75px
-            const moveY = (Math.random() * 150 - 75); // ขยับบนล่างไม่เกิน 75px
             
-            // หาตำแหน่งใหม่ (เทียบกับตำแหน่งเดิม)
-            // ถ้ายังไม่ได้ set position ให้เริ่มจากตำแหน่งปัจจุบัน
+            // ขยับทีละนิด (Dodge ระยะใกล้)
+            const moveX = (Math.random() * 200 - 100); 
+            const moveY = (Math.random() * 200 - 100);
+            
+            // หาตำแหน่งปัจจุบัน
             let rect = btn.getBoundingClientRect();
             let newLeft = rect.left + moveX;
             let newTop = rect.top + moveY;
 
             // กันตกขอบจอ
-            if(newLeft < 10) newLeft = 10;
+            if(newLeft < 20) newLeft = 20;
             if(newLeft > window.innerWidth - 100) newLeft = window.innerWidth - 100;
-            if(newTop < 10) newTop = 10;
+            if(newTop < 20) newTop = 20;
             if(newTop > window.innerHeight - 50) newTop = window.innerHeight - 50;
 
-            btn.style.position = 'fixed';
+            btn.style.position = 'fixed'; // บังคับ Fixed เพื่อให้ลอยเหนือทุกอย่าง
             btn.style.left = newLeft + 'px';
             btn.style.top = newTop + 'px';
         }
@@ -287,6 +287,22 @@
             document.getElementById('effects-container').appendChild(el);
             setTimeout(()=>el.remove(),6000);
         }
+
+        // --- Mouse Effect (ดาววิบวับตามเมาส์) ---
+        document.addEventListener('mousemove', function(e) {
+            if(Math.random() > 0.8) { // ไม่ต้องออกทุกครั้ง เดี๋ยวลายตา
+                const el = document.createElement('div');
+                el.className = 'bg-element';
+                el.innerHTML = '✨';
+                el.style.left = e.pageX + 'px';
+                el.style.top = e.pageY + 'px';
+                el.style.fontSize = Math.random()*15+10 + 'px';
+                el.style.animation = 'twinkle 1s linear';
+                el.style.zIndex = 200; // อยู่บนสุด
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1000);
+            }
+        });
     </script>
 </body>
 </html>
