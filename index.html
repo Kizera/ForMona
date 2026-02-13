@@ -10,38 +10,34 @@
         body {
             margin: 0;
             padding: 0;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
             font-family: 'Sarabun', sans-serif;
-            overflow-x: hidden;
+            overflow: hidden; 
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewport="0 0 20 20" style="fill:black;font-size:20px"><text y="15">💖</text></svg>'), auto;
         }
 
-        /* --- กล่องข้อความ --- */
         .card {
-            background: rgba(255, 255, 255, 0.90);
-            backdrop-filter: blur(5px);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-align: center;
-            max-width: 90%;
             width: 400px;
-            margin: 20px 0;
-            position: relative;
+            max-width: 90%;
+            position: absolute;
             z-index: 10;
-            transition: transform 0.3s;
+            transition: all 0.5s ease;
         }
-        .card:hover { transform: translateY(-5px); }
 
-        h1 { color: #ff4d6d; font-size: 1.8em; margin-bottom: 10px; text-shadow: 2px 2px 0px rgba(255,255,255,0.5); }
-        p { color: #555; font-size: 1.1em; line-height: 1.6; }
+        h1 { color: #ff4d6d; font-size: 2em; margin-bottom: 10px; text-shadow: 1px 1px 0px white; }
+        p { color: #555; font-size: 1.1em; }
         
-        .hidden-content { display: none; opacity: 0; transition: opacity 0.8s ease-in; }
+        .hidden-content { display: none; opacity: 0; transform: scale(0.9); transition: all 0.5s ease; }
         
         .btn {
             background: linear-gradient(45deg, #ff4d6d, #ff8fa3);
@@ -55,37 +51,65 @@
             box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
             transition: all 0.2s;
             position: relative;
-            z-index: 20; /* ให้ปุ่มอยู่เหนือทุกอย่าง */
+            z-index: 20;
         }
-        .btn:hover { transform: scale(1.1); box-shadow: 0 8px 20px rgba(255, 77, 109, 0.6); }
+        .btn:hover { transform: scale(1.1); }
         
-        /* ปุ่มหนี */
-        #no-btn {
-            background: #666;
-            position: absolute; /* เริ่มต้นเป็น Absolute ในกล่องก่อน */
-            transition: top 0.2s ease, left 0.2s ease; /* ใส่ Animation ให้วิ่งนุ่มๆ */
-        }
+        #no-btn { background: #666; position: absolute; transition: top 0.2s ease, left 0.2s ease; } /* เพิ่ม Transition ให้หนีนุ่มๆ */
 
-        /* --- Gallery --- */
-        .gallery {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .memory-img {
+        /* --- Gallery (แนวนอน) --- */
+        #gallery-container {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-            border: 3px solid white;
-            cursor: zoom-in; /* เปลี่ยนเมาส์เป็นแว่นขยาย */
+            height: 100%;
+            display: none; 
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(0,0,0,0.85); 
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 1s;
         }
-        .memory-img:hover { transform: scale(1.03) rotate(-1deg); }
 
-        .caption { font-size: 0.9em; color: #ff758c; margin-top: 5px; font-weight: bold; }
+        .scroll-track {
+            display: flex;
+            overflow-x: auto; 
+            scroll-behavior: smooth;
+            gap: 20px;
+            padding: 0 50px;
+            height: 70vh; 
+            align-items: center;
+            scrollbar-width: none; 
+        }
+        .scroll-track::-webkit-scrollbar { display: none; }
 
-        /* --- Lightbox (ขยายรูป) --- */
+        .gallery-item {
+            height: 100%; 
+            width: auto; 
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+            cursor: zoom-in;
+            flex-shrink: 0; 
+            object-fit: cover;
+            border: 2px solid white;
+        }
+        .gallery-item:hover { transform: scale(1.02); z-index: 10; }
+
+        .overlay-text {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        /* --- Lightbox --- */
         .lightbox {
             display: none;
             position: fixed;
@@ -94,100 +118,47 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             justify-content: center;
             align-items: center;
             cursor: zoom-out;
-            opacity: 0;
-            transition: opacity 0.3s;
         }
-        .lightbox img {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-            transform: scale(0.8);
-            transition: transform 0.3s;
-        }
-        .lightbox.active {
-            opacity: 1;
-        }
-        .lightbox.active img {
-            transform: scale(1);
-        }
+        .lightbox img { max-width: 95%; max-height: 95%; border-radius: 5px; box-shadow: 0 0 30px rgba(255,255,255,0.2); }
 
-        /* --- FX Elements --- */
-        .bg-element {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1;
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translateY(-10vh) scale(1.2) rotate(20deg); opacity: 0; }
-        }
-        @keyframes fallDown {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-        }
-        @keyframes twinkle {
-            0%, 100% { opacity: 0; transform: scale(0.5); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
+        .bg-element { position: fixed; pointer-events: none; z-index: 1; }
+        @keyframes floatUp { from { transform: translateY(100vh); opacity: 0; } to { transform: translateY(-10vh); opacity: 1; } }
+        @keyframes fallDown { from { transform: translateY(-10vh) rotate(0deg); } to { transform: translateY(100vh) rotate(360deg); } }
 
     </style>
 </head>
 <body>
 
-    <div id="lightbox" class="lightbox" onclick="closeImage()">
-        <img id="lightbox-img" src="">
-    </div>
-
     <div id="effects-container"></div>
+    <div id="lightbox" class="lightbox" onclick="closeImage()"><img id="lightbox-img" src=""></div>
 
     <div id="step1" class="card">
-        <h1 style="font-size: 5em; animation: twinkle 2s infinite;">💌</h1>
+        <h1 style="font-size: 4em;">💌</h1>
         <h1>มีความลับจะบอก...</h1>
         <p>พร้อมฟังรึยัง?</p>
         <button class="btn" onclick="nextStep('step1', 'step2')">พร้อมแล้ว!</button>
     </div>
 
     <div id="step2" class="card hidden-content">
-        <h1 style="font-size: 5em;">🤔</h1>
+        <h1 style="font-size: 4em;">🤔</h1>
         <h1>ถามจริงๆ นะ</h1>
         <p>รักเค้าไหม?</p>
         <div style="height: 100px; position: relative;">
-            <button class="btn" onclick="nextStep('step2', 'surprise')">รักที่สุด ❤️</button>
+            <button class="btn" onclick="startGallery()">รักที่สุด ❤️</button>
             <button class="btn" id="no-btn" onmouseover="moveButton()" ontouchstart="moveButton()">ไม่รัก 😝</button>
         </div>
     </div>
 
-    <div id="surprise" class="card hidden-content">
-        <h1 style="font-size: 5em;">🌹</h1>
-        <h1>Happy Valentine's Day</h1>
-        <p>ขอบคุณที่รักกันนะ ❤️</p>
-        <p style="font-size: 0.8em; color: #999;">(กดที่รูปเพื่อดูรูปใหญ่ได้นะ)</p>
-
-        <div class="gallery">
-            <div><img src="img1.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 1</div></div>
-            <div><img src="img2.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 2</div></div>
-            <div><img src="img3.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 3</div></div>
-            <div><img src="img4.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 4</div></div>
-            <div><img src="img5.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 5</div></div>
-            <div><img src="img6.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 6</div></div>
-
-            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 15px; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 3px solid white;">
-                <iframe 
-                    src="https://drive.google.com/file/d/1Hv_zlTYD3xID9uEZWKimJt9xFVj85MNz/preview" 
-                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
-                    frameborder="0" 
-                    allow="autoplay" 
-                    allowfullscreen>
-                </iframe>
-            </div>
-            <div class="caption">วิดีโอของเรา 🎥 (รอโหลดแป๊บนึงนะ)</div>
+    <div id="gallery-container">
+        <div class="overlay-text">
+            <h1 style="color: #ff4d6d; font-size: 3em;">Happy Valentine's Day</h1>
+            <p style="color: #fff; font-size: 1.2em;">เลื่อนขวาเพื่อดูความทรงจำของเรานะ 👉</p>
         </div>
+        <div class="scroll-track" id="track"></div>
     </div>
 
     <script>
@@ -195,103 +166,104 @@
             document.getElementById(current).style.display = 'none';
             const nextEl = document.getElementById(next);
             nextEl.style.display = 'block';
-            setTimeout(() => { nextEl.style.opacity = 1; }, 100);
-            
-            if(next === 'surprise') {
-                setInterval(createHeart, 100); 
-                setInterval(createFlower, 200);
-            }
+            setTimeout(() => { 
+                nextEl.style.opacity = 1; 
+                nextEl.style.transform = 'scale(1)'; 
+            }, 100);
         }
 
-        // --- แก้บั๊กปุ่มหนี (No Button Fix) ---
+        function startGallery() {
+            document.getElementById('step2').style.display = 'none';
+            const gallery = document.getElementById('gallery-container');
+            const track = document.getElementById('track');
+            
+            // Loop 56 Images
+            for(let i = 1; i <= 56; i++) {
+                const img = document.createElement('img');
+                img.src = `img${i}.png`; // ⚠️ เช็คว่าเป็น .png หรือ .jpg
+                img.className = 'gallery-item';
+                img.loading = 'lazy';
+                img.onclick = function() { openImage(this.src); };
+                track.appendChild(img);
+            }
+
+            const vdoDiv = document.createElement('div');
+            vdoDiv.className = 'gallery-item';
+            vdoDiv.style.width = '500px'; 
+            vdoDiv.style.position = 'relative';
+            vdoDiv.style.background = 'black';
+            vdoDiv.innerHTML = `
+                <iframe src="https://drive.google.com/file/d/1Hv_zlTYD3xID9uEZWKimJt9xFVj85MNz/preview" 
+                style="width:100%; height:100%; border:none;" allow="autoplay"></iframe>
+            `;
+            track.appendChild(vdoDiv);
+
+            gallery.style.display = 'flex';
+            setTimeout(() => { gallery.style.opacity = 1; }, 100);
+            setInterval(createHeart, 200);
+            setInterval(createFlower, 400);
+        }
+
+        // --- แก้ไข: สูตรคำนวณปุ่มไม่รัก (ไม่ให้ล้นจอ) ---
         function moveButton() {
             const btn = document.getElementById('no-btn');
             
-            // คำนวณพื้นที่หน้าจอ (ลบขนาดปุ่มออก เพื่อไม่ให้ตกขอบ)
-            const maxWidth = window.innerWidth - btn.offsetWidth - 20; 
-            const maxHeight = window.innerHeight - btn.offsetHeight - 20;
+            // 1. หาขนาดหน้าจอ
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            
+            // 2. หาขนาดปุ่ม
+            const btnW = btn.offsetWidth;
+            const btnH = btn.offsetHeight;
 
-            // สุ่มตำแหน่งใหม่ (ใช้ Math.max(0, ...) เพื่อกันค่าติดลบ)
-            const randomX = Math.max(0, Math.floor(Math.random() * maxWidth));
-            const randomY = Math.max(0, Math.floor(Math.random() * maxHeight));
+            // 3. กำหนดระยะปลอดภัย (Margin) ไม่ให้ชิดขอบจอเกินไป (เผื่อไว้ 20px)
+            const margin = 20;
 
-            // เปลี่ยนสถานะเป็น Fixed เพื่อให้หลุดจาก Layout เดิมและวิ่งไปทั่วจอได้
-            btn.style.position = 'fixed'; 
-            btn.style.left = randomX + 'px';
-            btn.style.top = randomY + 'px';
+            // 4. คำนวณพื้นที่ที่ปุ่มวิ่งได้จริง (หน้าจอ - ขนาดปุ่ม - ขอบ)
+            const maxLeft = screenW - btnW - margin;
+            const maxTop = screenH - btnH - margin;
+
+            // 5. สุ่มเลข (ใช้ Math.max(margin, ...) เพื่อกันไม่ให้ค่าน้อยกว่าขอบซ้าย/บน)
+            const newLeft = Math.max(margin, Math.random() * maxLeft);
+            const newTop = Math.max(margin, Math.random() * maxTop);
+
+            // 6. สั่งย้าย
+            btn.style.position = 'fixed';
+            btn.style.left = newLeft + 'px';
+            btn.style.top = newTop + 'px';
         }
 
-        // --- ระบบขยายรูป (Lightbox) ---
         function openImage(src) {
-            const lightbox = document.getElementById('lightbox');
-            const img = document.getElementById('lightbox-img');
-            img.src = src;
-            lightbox.style.display = 'flex'; // แสดงกล่องดำ
-            setTimeout(() => { lightbox.classList.add('active'); }, 10); // Fade in
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').style.display = 'flex';
         }
-
         function closeImage() {
-            const lightbox = document.getElementById('lightbox');
-            lightbox.classList.remove('active'); // Fade out
-            setTimeout(() => { lightbox.style.display = 'none'; }, 300); // รอ Animation จบแล้วซ่อน
+            document.getElementById('lightbox').style.display = 'none';
         }
 
-        // --- FX Elements ---
-        const container = document.getElementById('effects-container');
-
+        const fx = document.getElementById('effects-container');
         function createHeart() {
             const el = document.createElement('div');
-            el.classList.add('bg-element');
-            el.innerHTML = Math.random() > 0.5 ? '❤️' : '💖';
-            el.style.left = Math.random() * 100 + 'vw';
-            el.style.fontSize = Math.random() * 20 + 20 + 'px';
-            el.style.animation = `floatUp ${Math.random() * 3 + 2}s linear`;
-            container.appendChild(el);
-            setTimeout(() => el.remove(), 5000);
+            el.className = 'bg-element';
+            el.innerHTML = Math.random()>0.5 ? '❤️':'💖';
+            el.style.left = Math.random()*100+'vw';
+            el.style.fontSize = (Math.random()*20+20)+'px';
+            el.style.animation = `floatUp ${Math.random()*3+2}s linear`;
+            fx.appendChild(el);
+            setTimeout(()=>el.remove(),5000);
         }
-
         function createFlower() {
             const el = document.createElement('div');
-            el.classList.add('bg-element');
-            el.innerHTML = Math.random() > 0.5 ? '🌸' : '🌹';
-            el.style.left = Math.random() * 100 + 'vw';
+            el.className = 'bg-element';
+            el.innerHTML = Math.random()>0.5 ? '🌸':'🌹';
+            el.style.left = Math.random()*100+'vw';
             el.style.top = '-10vh';
-            el.style.fontSize = Math.random() * 20 + 15 + 'px';
-            el.style.animation = `fallDown ${Math.random() * 5 + 3}s linear`;
-            container.appendChild(el);
-            setTimeout(() => el.remove(), 8000);
+            el.style.fontSize = (Math.random()*20+15)+'px';
+            el.style.animation = `fallDown ${Math.random()*5+3}s linear`;
+            fx.appendChild(el);
+            setTimeout(()=>el.remove(),8000);
         }
-
-        function createSparkle() {
-            const el = document.createElement('div');
-            el.classList.add('bg-element');
-            el.innerHTML = '✨';
-            el.style.left = Math.random() * 100 + 'vw';
-            el.style.top = Math.random() * 100 + 'vh';
-            el.style.fontSize = Math.random() * 15 + 10 + 'px';
-            el.style.animation = `twinkle ${Math.random() * 2 + 1}s infinite`;
-            container.appendChild(el);
-            setTimeout(() => el.remove(), 3000);
-        }
-
-        document.addEventListener('mousemove', function(e) {
-            if(Math.random() > 0.8) { 
-                const el = document.createElement('div');
-                el.classList.add('bg-element');
-                el.innerHTML = '⭐';
-                el.style.left = e.pageX + 'px';
-                el.style.top = e.pageY + 'px';
-                el.style.fontSize = '15px';
-                el.style.pointerEvents = 'none';
-                el.style.animation = 'twinkle 1s linear';
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 1000);
-            }
-        });
-
         setInterval(createHeart, 800);
-        setInterval(createSparkle, 500);
-
     </script>
 </body>
 </html>
