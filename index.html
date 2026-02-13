@@ -16,14 +16,14 @@
             align-items: center;
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
             font-family: 'Sarabun', sans-serif;
-            overflow-x: hidden; /* ห้ามเลื่อนซ้ายขวา */
+            overflow-x: hidden;
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewport="0 0 20 20" style="fill:black;font-size:20px"><text y="15">💖</text></svg>'), auto;
         }
 
         /* --- กล่องข้อความ --- */
         .card {
             background: rgba(255, 255, 255, 0.90);
-            backdrop-filter: blur(5px); /* เบลอพื้นหลังนิดๆ ให้ดูหรู */
+            backdrop-filter: blur(5px);
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(255, 77, 109, 0.2);
@@ -33,7 +33,7 @@
             width: 400px;
             margin: 20px 0;
             position: relative;
-            z-index: 100; /* อยู่บนสุด */
+            z-index: 10;
             transition: transform 0.3s;
         }
         .card:hover { transform: translateY(-5px); }
@@ -55,15 +55,15 @@
             box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
             transition: all 0.2s;
             position: relative;
-            overflow: hidden;
+            z-index: 20; /* ให้ปุ่มอยู่เหนือทุกอย่าง */
         }
         .btn:hover { transform: scale(1.1); box-shadow: 0 8px 20px rgba(255, 77, 109, 0.6); }
         
-        /* เอฟเฟคปุ่มวิ่งหนี */
+        /* ปุ่มหนี */
         #no-btn {
             background: #666;
-            position: absolute;
-            transition: 0.1s;
+            position: absolute; /* เริ่มต้นเป็น Absolute ในกล่องก่อน */
+            transition: top 0.2s ease, left 0.2s ease; /* ใส่ Animation ให้วิ่งนุ่มๆ */
         }
 
         /* --- Gallery --- */
@@ -79,32 +79,58 @@
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
             transition: transform 0.3s;
             border: 3px solid white;
+            cursor: zoom-in; /* เปลี่ยนเมาส์เป็นแว่นขยาย */
         }
         .memory-img:hover { transform: scale(1.03) rotate(-1deg); }
 
         .caption { font-size: 0.9em; color: #ff758c; margin-top: 5px; font-weight: bold; }
 
-        /* --- FX: Background Elements --- */
-        .bg-element {
+        /* --- Lightbox (ขยายรูป) --- */
+        .lightbox {
+            display: none;
             position: fixed;
-            pointer-events: none; /* ห้ามคลิกโดน */
-            z-index: 1;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s;
+        }
+        .lightbox.active {
+            opacity: 1;
+        }
+        .lightbox.active img {
+            transform: scale(1);
         }
 
-        /* หัวใจลอย */
+        /* --- FX Elements --- */
+        .bg-element {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+        }
         @keyframes floatUp {
             0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
             20% { opacity: 1; }
             100% { transform: translateY(-10vh) scale(1.2) rotate(20deg); opacity: 0; }
         }
-
-        /* ดอกไม้ร่วง */
         @keyframes fallDown {
             0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
-
-        /* วิบวับ */
         @keyframes twinkle {
             0%, 100% { opacity: 0; transform: scale(0.5); }
             50% { opacity: 1; transform: scale(1.2); }
@@ -113,6 +139,10 @@
     </style>
 </head>
 <body>
+
+    <div id="lightbox" class="lightbox" onclick="closeImage()">
+        <img id="lightbox-img" src="">
+    </div>
 
     <div id="effects-container"></div>
 
@@ -127,9 +157,9 @@
         <h1 style="font-size: 5em;">🤔</h1>
         <h1>ถามจริงๆ นะ</h1>
         <p>รักเค้าไหม?</p>
-        <div style="height: 80px; position: relative;">
+        <div style="height: 100px; position: relative;">
             <button class="btn" onclick="nextStep('step2', 'surprise')">รักที่สุด ❤️</button>
-            <button class="btn" id="no-btn" onmouseover="moveButton()">ไม่รัก 😝</button>
+            <button class="btn" id="no-btn" onmouseover="moveButton()" ontouchstart="moveButton()">ไม่รัก 😝</button>
         </div>
     </div>
 
@@ -137,14 +167,15 @@
         <h1 style="font-size: 5em;">🌹</h1>
         <h1>Happy Valentine's Day</h1>
         <p>ขอบคุณที่รักกันนะ ❤️</p>
+        <p style="font-size: 0.8em; color: #999;">(กดที่รูปเพื่อดูรูปใหญ่ได้นะ)</p>
 
         <div class="gallery">
-            <div><img src="img1.png" class="memory-img"><div class="caption">ความทรงจำที่ 1</div></div>
-            <div><img src="img2.png" class="memory-img"><div class="caption">ความทรงจำที่ 2</div></div>
-            <div><img src="img3.png" class="memory-img"><div class="caption">ความทรงจำที่ 3</div></div>
-            <div><img src="img4.png" class="memory-img"><div class="caption">ความทรงจำที่ 4</div></div>
-            <div><img src="img5.png" class="memory-img"><div class="caption">ความทรงจำที่ 5</div></div>
-            <div><img src="img6.png" class="memory-img"><div class="caption">ความทรงจำที่ 6</div></div>
+            <div><img src="img1.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 1</div></div>
+            <div><img src="img2.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 2</div></div>
+            <div><img src="img3.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 3</div></div>
+            <div><img src="img4.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 4</div></div>
+            <div><img src="img5.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 5</div></div>
+            <div><img src="img6.png" class="memory-img" onclick="openImage(this.src)"><div class="caption">ความทรงจำที่ 6</div></div>
 
             <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 15px; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 3px solid white;">
                 <iframe 
@@ -164,31 +195,50 @@
             document.getElementById(current).style.display = 'none';
             const nextEl = document.getElementById(next);
             nextEl.style.display = 'block';
-            
-            // Trigger animation
             setTimeout(() => { nextEl.style.opacity = 1; }, 100);
             
-            // ถ้าถึงหน้าเฉลย ให้ระเบิดเอฟเฟคเยอะๆ
             if(next === 'surprise') {
-                setInterval(createHeart, 100); // หัวใจรัวๆ
-                setInterval(createFlower, 200); // ดอกไม้ร่วง
+                setInterval(createHeart, 100); 
+                setInterval(createFlower, 200);
             }
         }
 
-        // ปุ่มหนี
+        // --- แก้บั๊กปุ่มหนี (No Button Fix) ---
         function moveButton() {
             const btn = document.getElementById('no-btn');
-            const x = Math.random() * (window.innerWidth - btn.offsetWidth - 50);
-            const y = Math.random() * (window.innerHeight - btn.offsetHeight - 50);
-            btn.style.position = 'fixed';
-            btn.style.left = x + 'px';
-            btn.style.top = y + 'px';
+            
+            // คำนวณพื้นที่หน้าจอ (ลบขนาดปุ่มออก เพื่อไม่ให้ตกขอบ)
+            const maxWidth = window.innerWidth - btn.offsetWidth - 20; 
+            const maxHeight = window.innerHeight - btn.offsetHeight - 20;
+
+            // สุ่มตำแหน่งใหม่ (ใช้ Math.max(0, ...) เพื่อกันค่าติดลบ)
+            const randomX = Math.max(0, Math.floor(Math.random() * maxWidth));
+            const randomY = Math.max(0, Math.floor(Math.random() * maxHeight));
+
+            // เปลี่ยนสถานะเป็น Fixed เพื่อให้หลุดจาก Layout เดิมและวิ่งไปทั่วจอได้
+            btn.style.position = 'fixed'; 
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
         }
 
-        // --- ZONE เอฟเฟคฟรุ้งฟริ้ง ---
+        // --- ระบบขยายรูป (Lightbox) ---
+        function openImage(src) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            img.src = src;
+            lightbox.style.display = 'flex'; // แสดงกล่องดำ
+            setTimeout(() => { lightbox.classList.add('active'); }, 10); // Fade in
+        }
+
+        function closeImage() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active'); // Fade out
+            setTimeout(() => { lightbox.style.display = 'none'; }, 300); // รอ Animation จบแล้วซ่อน
+        }
+
+        // --- FX Elements ---
         const container = document.getElementById('effects-container');
 
-        // 1. สร้างหัวใจลอย
         function createHeart() {
             const el = document.createElement('div');
             el.classList.add('bg-element');
@@ -200,7 +250,6 @@
             setTimeout(() => el.remove(), 5000);
         }
 
-        // 2. สร้างดอกไม้ร่วง
         function createFlower() {
             const el = document.createElement('div');
             el.classList.add('bg-element');
@@ -213,7 +262,6 @@
             setTimeout(() => el.remove(), 8000);
         }
 
-        // 3. สร้างประกายวิบวับ (Sparkle)
         function createSparkle() {
             const el = document.createElement('div');
             el.classList.add('bg-element');
@@ -223,13 +271,11 @@
             el.style.fontSize = Math.random() * 15 + 10 + 'px';
             el.style.animation = `twinkle ${Math.random() * 2 + 1}s infinite`;
             container.appendChild(el);
-            // Sparkle อยู่นานหน่อย แต่ไม่ลบออกก็ได้เพราะใช้ infinite animation (แต่เพื่อ performance ลบดีกว่า)
             setTimeout(() => el.remove(), 3000);
         }
 
-        // 4. เอฟเฟคตามเมาส์ (Mouse Trail)
         document.addEventListener('mousemove', function(e) {
-            if(Math.random() > 0.8) { // ไม่ต้องออกทุกครั้งที่ขยับ เดี๋ยวเยอะไป
+            if(Math.random() > 0.8) { 
                 const el = document.createElement('div');
                 el.classList.add('bg-element');
                 el.innerHTML = '⭐';
@@ -243,7 +289,6 @@
             }
         });
 
-        // รันเอฟเฟคเริ่มต้นเบาๆ
         setInterval(createHeart, 800);
         setInterval(createSparkle, 500);
 
